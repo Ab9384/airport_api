@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 )
 
 type Airport struct {
@@ -21,6 +22,7 @@ type Airport struct {
 }
 
 var airportList []Airport
+var mutex = sync.RWMutex{}
 
 func loadAirportData() {
 	file, err := os.Open("./airport_data.json")
@@ -40,6 +42,8 @@ func searchAirports(query string) []Airport {
 	query = strings.ToLower(query)
 	var results = []Airport{}
 	query = strings.ToLower(query)
+	mutex.RLock()
+	defer mutex.RUnlock()
 
 	for _, airport := range airportList {
 		if strings.Contains(strings.ToLower(airport.ICAO), query) ||
